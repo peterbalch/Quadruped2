@@ -1,0 +1,148 @@
+{\rtf1\ansi\ansicpg1252\deff0{\fonttbl{\f0\fswiss\fcharset0 Arial;}{\f1\fnil\fcharset2 Symbol;}}
+{\*\generator Msftedit 5.41.15.1515;}\viewkind4\uc1\pard\lang2057\f0\fs20 The Arduino Quad3.ino sketch can control up to 18 servos.\par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi-152\li720 Servo 0 = pin D2\par
+{\pntext\f1\'B7\tab}Servo 1 = pin D3\par
+{\pntext\f1\'B7\tab}Servo 2 = pin D4\par
+{\pntext\f1\'B7\tab}Servo 3 = pin D5\par
+{\pntext\f1\'B7\tab}Servo 4 = pin D6\par
+{\pntext\f1\'B7\tab}Servo 5 = pin D7\par
+{\pntext\f1\'B7\tab}Servo 6 = pin D8\par
+{\pntext\f1\'B7\tab}Servo 7 = pin D9\par
+{\pntext\f1\'B7\tab}Servo 8 = pin D10\par
+{\pntext\f1\'B7\tab}Servo 9 = pin A0\par
+{\pntext\f1\'B7\tab}Servo 10 = pin A1\par
+{\pntext\f1\'B7\tab}Servo 11 = pin A2\par
+{\pntext\f1\'B7\tab}Servo 12 = pin A3\par
+{\pntext\f1\'B7\tab}Servo 13 = pin A4\par
+{\pntext\f1\'B7\tab}Servo 14 = pin A5\par
+{\pntext\f1\'B7\tab}Servo 15 = pin D11\par
+{\pntext\f1\'B7\tab}Servo 16 = pin D12\par
+{\pntext\f1\'B7\tab}Servo 17 = pin D13\par
+\pard\par
+The sketch includes my own version of the Servos.h Arduino library but I have added more servos. The standard library allows a maximum of 12 servos per timer and for the Arduino Nano, it uses only one timer. I've modified the Servos.h file to allow 18 servos per timer. \par
+\par
+#define SERVOS_PER_TIMER 18 // the maximum number of servos controlled by one timer\par
+\par
+And I've renamed it to myServos. Put all the files in the same directory as the Quad3.ino sketch.\par
+\par
+Using 18 sevos per timer alters the timing a little when you're using all the servo pins at once but seems to work OK.\par
+\par
+Gait-tables can be stored in PROGMEM or EEPROM. \par
+\par
+To use EEPROM, include this line in the sketch\par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi-152\li720 #define UseEEPROM\par
+\pard (It's commented out by default.)\par
+\par
+I don't recommend using EEPROM. It's too small to be useful. If a gait typically has 12 poses for 12 servos, that's 144 bytes, So you'll only have room for 7 gaits in the 1024 bytes of EEPROM.\par
+\par
+I'm going to assume you're using PROGMEM which is much bigger. In theory you'll have room for hundreds of gait.\par
+\par
+Each gait-table has the following format:\par
+\par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi-152\li720 number of poses in gait (1 byte)\par
+{\pntext\f1\'B7\tab}ServoSet - 1 bit per servo (4 bytes)\par
+{\pntext\f1\'B7\tab}servo angles (numposes * servoset.count bytes)\par
+\pard\par
+The last gait is followed by a zero byte to mark the end of the tables\par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi-152\li720 0 (1 byte)\par
+\pard\par
+The Servo18.exe program can write its gait-tables to a file usually called Gaits.h.\par
+\par
+A typical Gaits.h file contains\par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi-152\li720 const byte WaveLegs[] PROGMEM = \{\par
+{\pntext\f1\'B7\tab}  9, // num poses\par
+{\pntext\f1\'B7\tab}  0xFB,0x1F,0x00,0x00, // servo set\par
+{\pntext\f1\'B7\tab}  71, 149, 90, 90, 90, 90, 36, 109, 86, 134, 75, 54, \par
+{\pntext\f1\'B7\tab}  71, 149, 90, 90, 90, 90, 36, 109, 86, 134, 134, 120, \par
+{\pntext\f1\'B7\tab}  71, 149, 90, 90, 90, 90, 36, 109, 86, 134, 75, 54, \par
+{\pntext\f1\'B7\tab}  71, 149, 90, 90, 90, 90, 36, 109, 136, 53, 75, 54, \par
+{\pntext\f1\'B7\tab}  71, 149, 90, 90, 90, 90, 36, 109, 86, 134, 75, 54, \par
+{\pntext\f1\'B7\tab}  133, 88, 90, 90, 90, 90, 36, 109, 86, 134, 75, 54, \par
+{\pntext\f1\'B7\tab}  71, 149, 90, 90, 90, 90, 36, 109, 86, 134, 75, 54, \par
+{\pntext\f1\'B7\tab}  71, 149, 90, 90, 90, 90, 84, 41, 86, 134, 75, 54, \par
+{\pntext\f1\'B7\tab}  71, 149, 90, 90, 90, 90, 36, 109, 86, 134, 75, 54\};\par
+{\pntext\f1\'B7\tab}\par
+{\pntext\f1\'B7\tab}const byte Grip[] PROGMEM = \{\par
+{\pntext\f1\'B7\tab}  2, // num poses\par
+{\pntext\f1\'B7\tab}  0x04,0x00,0x00,0x00, // servo set\par
+{\pntext\f1\'B7\tab}  79, \par
+{\pntext\f1\'B7\tab}  136\};\par
+\pard\par
+This example contains two gaits: WaveLegs and Grip. With WaveLegs, the robot lies on its back waving its legs in the air (a useful test!). With Grip, the robot opens and closes its gripper.\par
+\par
+The WaveLegs table says that is contains 9 poses. The servos it uses are in the set 0x1FFB. That's a long integer with 1 bit per servo There are 12 bits set so the gait uses 12 servos. Bit 2 is set to zero so servo 2 is not used. Then come 9 poses and each pose specifies the angles of 12 servos. \par
+\par
+The Grip table says that it contains 2 poses - gripper open or closed. The servos it uses are in the set 0x0004. There is one bit set in the servo-set so the gait uses 1 servo. Bit 2 is set so servo 2 is used for the gripper. \par
+\pard\qr\par
+\pard Of course, you will have plugged the leg and gripper servos into different pins. You will have specifed that in the Servo18.exe program.\par
+\par
+Opening and closing the gripper is not really a "gait" but it's controlled by a gait-table so we'll call it a gait.\par
+\par
+The Arduino Quad3.ino sketch can accept the following command bytes over the USB cable from the PC:\par
+\par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi-142\li568\tx568 181..199: select the current servo as N-181  \par
+{\pntext\f1\'B7\tab}0..180: select the current servo angle to N\par
+{\pntext\f1\'B7\tab}200: send EEPROM contents from PC to Arduino\par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi284\li568\tx568 followed by 1024 bytes of data\par
+{\pntext\f1\'B7\tab}Arduino replies to each byte with 0xFF\par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi-142\li568\tx568 201: fetch EEPROM contents from Arduino to PC\par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi284\li568\tx568 Arduino replies with 1024 bytes of data followed by 0xFF\par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi-142\li568\tx568 202: starts running a gait in the Arduino \par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi284\li568\tx568 followed by 1 byte of gait number\par
+{\pntext\f1\'B7\tab}Arduino replies with 0xFF\par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi-142\li568\tx568 203: set MaxSpeed \par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi284\li568\tx568 followed by 1 byte of gait number\par
+{\pntext\f1\'B7\tab}followed by 1 byte of speed\par
+{\pntext\f1\'B7\tab}Arduino replies with 0xFF\par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi-142\li568\tx568 204: set MinTime \par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi284\li568\tx568 followed by 1 byte of gait number\par
+{\pntext\f1\'B7\tab}followed by 1 byte of min approach time\par
+{\pntext\f1\'B7\tab}Arduino replies with 0xFF\par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi-142\li568\tx568 205: BlendRun: \par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi284\li568\tx568 followed by 1 byte of gait table A\par
+{\pntext\f1\'B7\tab}followed by 1 byte of share of A\par
+{\pntext\f1\'B7\tab}followed by 1 byte of gait table B\par
+{\pntext\f1\'B7\tab}followed by 1 byte of share of B\par
+{\pntext\f1\'B7\tab}followed by 1 byte of start pose; may be 255\par
+{\pntext\f1\'B7\tab}followed by 1 byte of end pose; may be 255\par
+{\pntext\f1\'B7\tab}Arduino replies with 0xFF\par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi-142\li568\tx568 206: StopNow: \par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi284\li568\tx568 followed by 1 byte of gait number\par
+{\pntext\f1\'B7\tab}Arduino replies with 0xFF\par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi-142\li568\tx568 207: StopWhen: \par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi284\li568\tx568 followed by 1 byte of gait number\par
+{\pntext\f1\'B7\tab}followed by 1 byte of pose number\par
+{\pntext\f1\'B7\tab}Arduino replies with 0xFF\par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi-142\li568\tx568 208: QueryPose\par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi284\li568\tx568 followed by 1 byte of gait number\par
+{\pntext\f1\'B7\tab}Arduino replies with the current pose of the gait (or 255 if gait not running)\par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi-142\li568\tx568 209: AtTargets\par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi284\li568\tx568 followed by 1 byte of gait number\par
+{\pntext\f1\'B7\tab}Arduino replies with 1 if serovs positions same as target positions; 0 they are not or 255 if gait not running\par
+\pard\par
+Commands 200 and 201 can only be used if you've enabled storing gaits in EEPROM.\par
+\par
+You can run a gait from your program by calling\par
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi-152\li720 RunTable(WaveLegs, 0, 255);\par
+\pard\par
+start running a gait <<<<<<<<<<<<<<\par
+  void RunTable(int gait_table_addr, byte poseN, byte poseM)\par
+  run once from pose N to pose M\par
+  if N = 255 then start wherever you currently are\par
+  if M = 255 then run forever\par
+    loop back to beginning\par
+\par
+each gait has its own max speed\par
+each gait has its own min time\par
+\par
+The function of the Quad3.ino sketch is to accept and run commands from a PC and allow you to develop your gait-tables. You will replace it with your own sketch that does something useful with your robot.\par
+\par
+Notice how the main loop of my program contains the code\par
+\par
+  RunGaits();\par
+\par
+RunGaits() runs the code to control running the gait tables. If you don't call it every few milliseconds, none of the gaits will run. So you must remember to call it inside any loops that are waiting for something to happen.\par
+\par
+\par
+}
+ 
